@@ -1,23 +1,57 @@
-export interface ProductServiceInterface {
-  index(): Promise<any[]>;
-  create(): Promise<any>;
-  update(): Promise<any>;
-  delete(): Promise<any>;
-}
+import { BaseServiceInterface } from "@/utils/interfaces";
+import { ProductInterface } from "./product.model";
+import ProductRepository, {
+  ProductRepositoryInterface,
+} from "./product.repository";
+
+export interface ProductServiceInterface
+  extends BaseServiceInterface<ProductInterface> {}
 
 class ProductService implements ProductServiceInterface {
-  index(): Promise<any[]> {
-    throw new Error("Method not implemented.");
+  constructor(private productRepository: ProductRepositoryInterface) {}
+
+  async index(): Promise<ProductInterface[]> {
+    const products = await this.productRepository.index();
+
+    return products;
   }
-  create(): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async create(data: ProductInterface): Promise<ProductInterface> {
+    const newProduct = await this.productRepository.create(data);
+
+    return newProduct;
   }
-  update(): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async update(id: number, data: ProductInterface): Promise<ProductInterface> {
+    const product = await this.productRepository.findById(id);
+
+    if (!product?.id) throw new Error("Product not found");
+
+    const updatedProduct = await this.productRepository.update(
+      product.id,
+      data
+    );
+
+    return updatedProduct;
   }
-  delete(): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async delete(id): Promise<{ id: number }> {
+    const product = await this.productRepository.findById(id);
+
+    if (!product?.id) throw new Error("Product not found");
+
+    const deleteProduct = await this.productRepository.delete(id);
+
+    return deleteProduct;
+  }
+
+  async findById(id: number): Promise<ProductInterface | null> {
+    const product = await this.productRepository.findById(id);
+
+    if (!product) throw new Error("Product not found");
+
+    return product;
   }
 }
 
-export default new ProductService();
+export default new ProductService(ProductRepository);
