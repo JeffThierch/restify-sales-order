@@ -12,6 +12,6 @@ export const environment: EnvironmentInterface = {
   DB_USER: process.env.DB_USER ?? "root",
   DB_PASSWORD: process.env.DB_PASSWORD ?? "root",
   DB_DATABASE: process.env.DB_DATABASE ?? "sales_order",
-  DB_HOST: process.env.DB_HOST ?? "restify-sales-order-dev-database",
+  DB_HOST: process.env.DB_HOST ?? "0.0.0.0",
   DB_PORT: parseInt(process.env.DB_PORT ?? "3306"),
 };
