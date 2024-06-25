@@ -1,23 +1,52 @@
-export interface OrderServiceInterface {
-  index(): Promise<any[]>;
-  create(): Promise<any>;
-  update(): Promise<any>;
-  delete(): Promise<any>;
-}
+import { BaseServiceInterface } from "@/utils/interfaces";
+import { OrderInterface } from "./order.model";
+import OrderRepository, { OrderRepositoryInterface } from "./order.repository";
+
+export interface OrderServiceInterface
+  extends BaseServiceInterface<OrderInterface> {}
 
 class OrderService implements OrderServiceInterface {
-  index(): Promise<any[]> {
-    throw new Error("Method not implemented.");
+  constructor(private orderRepository: OrderRepositoryInterface) {}
+
+  async index(): Promise<OrderInterface[]> {
+    const products = await this.orderRepository.index();
+
+    return products;
   }
-  create(): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async create(data: OrderInterface): Promise<OrderInterface> {
+    const newProduct = await this.orderRepository.create(data);
+
+    return newProduct;
   }
-  update(): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async update(id: number, data: OrderInterface): Promise<OrderInterface> {
+    const product = await this.orderRepository.findById(id);
+
+    if (!product?.id) throw new Error("Product not found");
+
+    const updatedProduct = await this.orderRepository.update(product.id, data);
+
+    return updatedProduct;
   }
-  delete(): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async delete(id): Promise<{ id: number }> {
+    const product = await this.orderRepository.findById(id);
+
+    if (!product?.id) throw new Error("Product not found");
+
+    const deleteProduct = await this.orderRepository.delete(id);
+
+    return deleteProduct;
+  }
+
+  async findById(id: number): Promise<OrderInterface | null> {
+    const product = await this.orderRepository.findById(id);
+
+    if (!product) throw new Error("Product not found");
+
+    return product;
   }
 }
 
-export default new OrderService();
+export default new OrderService(OrderRepository);
