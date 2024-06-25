@@ -14,7 +14,8 @@
     "@gilbertco/restify-async-wrap": "^0.1.2",
     "http-status-codes": "^2.3.0",
     "mysql2": "^3.10.1",
-    "restify": "^11.1.0"
+    "restify": "^11.1.0",
+    "restify-cors-middleware2": "^2.2.1"
   },
   "overrides": {
     "eslint": "^9.5.0"

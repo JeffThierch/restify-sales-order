@@ -1,19 +1,22 @@
 import { createServer, Server, plugins } from "restify";
 import { environment } from "./config/environment";
 import routes from "./routes";
+import cors from "./config/cors";
 
 async function initApp() {
-  const app: Server = createServer({
+  const server: Server = createServer({
     name: "restify-sales-order",
     version: "1.0.0",
   });
 
-  app.use(plugins.queryParser());
-  app.use(plugins.bodyParser());
+  server.use(plugins.queryParser());
+  server.use(plugins.bodyParser());
+  server.pre(cors.preflight);
+  server.use(cors.actual);
 
-  routes(app);
+  routes(server);
 
-  app.listen(environment.SERVER_PORT, () => {
+  server.listen(environment.SERVER_PORT, () => {
     console.info(
       `O servidor esta rodando na porta: HTTP - ${environment.SERVER_PORT}`
     );
