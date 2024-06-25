@@ -1,15 +1,13 @@
 import db from "../../../config/connect.mysql";
+import { BaseRepositoryInterface } from "../../../utils/interfaces";
 import { ClientInterface } from "./client.model";
+import { ResultSetHeader } from "mysql2";
 
-export interface ClientRepositoryInterface {
-  index(): Promise<ClientInterface[]>;
-  create(data: ClientInterface): Promise<ClientInterface>;
-  update(id: number, data: ClientInterface): Promise<ClientInterface>;
-  delete(id: number): Promise<ClientInterface>;
-}
+export interface ClientRepositoryInterface
+  extends BaseRepositoryInterface<ClientInterface> {}
 
 class ClientRepository implements ClientRepositoryInterface {
-  private tableName = "client";
+  private tableName = "clients";
 
   async index(): Promise<ClientInterface[]> {
     const [results] = await db.query(`SELECT * FROM ${this.tableName}`, []);
@@ -20,27 +18,53 @@ class ClientRepository implements ClientRepositoryInterface {
   }
 
   async create(data: ClientInterface): Promise<ClientInterface> {
-    const [results] = await db.query("", []);
+    const [results] = await db.query<ResultSetHeader>(
+      `INSERT INTO ${this.tableName} (name, email) VALUES (?, ?)`,
+      [data.name, data.email]
+    );
 
-    const client = results as ClientInterface;
+    const clientId = results.insertId;
 
-    return client;
+    if (!clientId) throw new Error("Error during client creation");
+
+    const client = await this.findById(clientId);
+
+    return client as ClientInterface;
   }
 
   async update(id: number, data: ClientInterface): Promise<ClientInterface> {
-    const [results] = await db.query("", []);
+    const [results] = await db.query<ResultSetHeader>(
+      `UPDATE ${this.tableName} SET name = ?, email = ? WHERE id = ${id};`,
+      [data.name, data.email]
+    );
 
-    const client = results as ClientInterface;
+    if (!results.affectedRows) throw new Error("Error during client update");
 
-    return client;
+    const client = await this.findById(id);
+
+    return client as ClientInterface;
   }
 
-  async delete(id: number): Promise<ClientInterface> {
-    const [results] = await db.query("", []);
+  async delete(id: number): Promise<{ id: number }> {
+    const [results] = await db.query<ResultSetHeader>(
+      `DELETE FROM ${this.tableName} WHERE id = ${id}`
+    );
 
-    const client = results as ClientInterface;
+    if (!results.affectedRows) throw new Error("Error during client delete");
 
-    return client;
+    return { id };
+  }
+
+  async findById(id: number): Promise<ClientInterface | null> {
+    const [results] = await db.query(
+      `SELECT * FROM ${this.tableName} WHERE id = ${id}`
+    );
+
+    if (!results[0]) return null;
+
+    const clients = results[0] as ClientInterface;
+
+    return clients;
   }
 }
 
