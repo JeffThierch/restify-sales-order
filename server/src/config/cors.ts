@@ -5,6 +5,7 @@ const cors = corsMiddleware({
   origins: ["*"],
   allowHeaders: ["API-Token"],
   exposeHeaders: ["API-Token-Expiry"],
+  allowCredentialsAllOrigins: true,
 });
 
 export default cors;
