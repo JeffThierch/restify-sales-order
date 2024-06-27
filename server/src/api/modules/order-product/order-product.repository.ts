@@ -5,7 +5,10 @@ import { OrderProductInterface } from "./order-product.model";
 import { ResultSetHeader } from "mysql2";
 
 export interface OrderProductRepositoryInterface
-  extends BaseRepositoryInterface<OrderProductInterface> {}
+  extends BaseRepositoryInterface<OrderProductInterface> {
+  deleteAllByOrderId(order_id: number): Promise<void>;
+  getAllByOrderId(order_id: number): Promise<OrderProductInterface[]>;
+}
 
 class OrderProductRepository implements OrderProductRepositoryInterface {
   private tableName = "order_product";
@@ -68,9 +71,25 @@ class OrderProductRepository implements OrderProductRepositoryInterface {
 
     if (!results[0]) return null;
 
-    const product = results[0] as OrderProductInterface;
+    const orderProduct = results[0] as OrderProductInterface;
 
-    return product;
+    return orderProduct;
+  }
+
+  async deleteAllByOrderId(orderId: number) {
+    await db.query<ResultSetHeader>(
+      `DELETE FROM ${this.tableName} WHERE order_id = ${orderId}`
+    );
+  }
+
+  async getAllByOrderId(orderId: number) {
+    const [results] = await db.query(
+      `SELECT * FROM ${this.tableName} WHERE order_id = ${orderId}`
+    );
+
+    const orderProduct = results as OrderProductInterface[];
+
+    return orderProduct;
   }
 }
 

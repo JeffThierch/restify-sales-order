@@ -3,15 +3,20 @@ import db from "../../../config/connect.mysql";
 import { BaseRepositoryInterface } from "@/utils/interfaces";
 import { OrderInterface } from "./order.model";
 import { ResultSetHeader } from "mysql2";
+import { ProductInterface } from "../products/product.model";
+import { ClientInterface } from "../clients/client.model";
 
 export interface OrderRepositoryInterface
-  extends BaseRepositoryInterface<OrderInterface> {}
+  extends BaseRepositoryInterface<OrderInterface> {
+  getAllOrderProducts(orderId: number): Promise<ProductInterface[]>;
+  getOrderClient(orderId: number): Promise<ClientInterface>;
+}
 
 class OrderRepository implements OrderRepositoryInterface {
   private tableName = "orders";
 
   async index(): Promise<OrderInterface[]> {
-    const [results] = await db.query(`SELECT * FROM ${this.tableName}`, []);
+    const [results] = await db.query(`SELECT * FROM ${this.tableName}`);
 
     const orders = results as OrderInterface[];
 
@@ -66,6 +71,28 @@ class OrderRepository implements OrderRepositoryInterface {
     const order = results[0] as OrderInterface;
 
     return order;
+  }
+
+  async getAllOrderProducts(orderId) {
+    const [results] = await db.query(
+      `SELECT * FROM products AS prod WHERE prod.id IN (SELECT op.product_id FROM order_product AS op WHERE op.order_id = ${orderId})
+      `
+    );
+
+    const products = results as ProductInterface[];
+
+    return products;
+  }
+
+  async getOrderClient(orderId) {
+    const [results] = await db.query(
+      `SELECT * FROM clients AS cl WHERE cl.id = (SELECT ord.client_id FROM ${this.tableName} AS ord WHERE ord.id = ${orderId})
+      `
+    );
+
+    const client = results[0] as ClientInterface;
+
+    return client;
   }
 }
 

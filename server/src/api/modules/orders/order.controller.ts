@@ -36,6 +36,13 @@ class OrderController {
     res.send(StatusCodes.OK, client);
     return next();
   }
+
+  async getById(req: Request, res: Response, next: Next) {
+    const client = await OrderService.findById(req.params.id);
+
+    res.send(StatusCodes.OK, client);
+    return next();
+  }
 }
 
 export default new OrderController(OrderService);

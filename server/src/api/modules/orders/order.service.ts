@@ -1,52 +1,126 @@
 import { BaseServiceInterface } from "@/utils/interfaces";
 import { OrderInterface } from "./order.model";
 import OrderRepository, { OrderRepositoryInterface } from "./order.repository";
+import OrderProductRepository, {
+  OrderProductRepositoryInterface,
+} from "../order-product/order-product.repository";
 
 export interface OrderServiceInterface
   extends BaseServiceInterface<OrderInterface> {}
 
 class OrderService implements OrderServiceInterface {
-  constructor(private orderRepository: OrderRepositoryInterface) {}
+  constructor(
+    private orderRepository: OrderRepositoryInterface,
+    private orderProductRepository: OrderProductRepositoryInterface
+  ) {}
 
   async index(): Promise<OrderInterface[]> {
-    const products = await this.orderRepository.index();
+    const orders = await this.orderRepository.index();
 
-    return products;
+    const ordersWithRelations = await Promise.all(
+      orders.map(async (order) => {
+        const orderId = order.id as number;
+
+        return {
+          ...order,
+          orderProducts: await this.orderProductRepository.getAllByOrderId(
+            orderId
+          ),
+          products: await this.orderRepository.getAllOrderProducts(orderId),
+          client: await this.orderRepository.getOrderClient(orderId),
+        };
+      })
+    );
+
+    return ordersWithRelations;
   }
 
   async create(data: OrderInterface): Promise<OrderInterface> {
-    const newProduct = await this.orderRepository.create(data);
+    const newOrder = await this.orderRepository.create(data);
 
-    return newProduct;
+    const products = (data.products ?? []) as any[];
+    const orderId = newOrder.id as number;
+
+    const orderProducts: any[] = [];
+
+    for (const product of products) {
+      orderProducts.push(
+        await this.orderProductRepository.create({
+          product_id: product.product_id,
+          order_id: orderId,
+          quantity: product.quantity,
+          price: product.price,
+        })
+      );
+    }
+
+    return {
+      ...newOrder,
+      orderProducts,
+      products: await this.orderRepository.getAllOrderProducts(orderId),
+      client: await this.orderRepository.getOrderClient(orderId),
+    };
   }
 
   async update(id: number, data: OrderInterface): Promise<OrderInterface> {
-    const product = await this.orderRepository.findById(id);
+    const order = await this.orderRepository.findById(id);
 
-    if (!product?.id) throw new Error("Product not found");
+    if (!order?.id) throw new Error("Order not found");
 
-    const updatedProduct = await this.orderRepository.update(product.id, data);
+    const updatedOrder = await this.orderRepository.update(order.id, data);
 
-    return updatedProduct;
+    const orderId = updatedOrder.id as number;
+    const products = (data.products ?? []) as any[];
+
+    await this.orderProductRepository.deleteAllByOrderId(orderId);
+
+    for (const product of products) {
+      await this.orderProductRepository.create({
+        product_id: product.product_id,
+        order_id: orderId,
+        quantity: product.quantity,
+        price: product.price,
+      });
+    }
+
+    const orderProducts = await this.orderProductRepository.getAllByOrderId(
+      orderId
+    );
+
+    return {
+      ...updatedOrder,
+      orderProducts: orderProducts,
+      products: await this.orderRepository.getAllOrderProducts(orderId),
+      client: await this.orderRepository.getOrderClient(orderId),
+    };
   }
 
   async delete(id): Promise<{ id: number }> {
-    const product = await this.orderRepository.findById(id);
+    const order = await this.orderRepository.findById(id);
 
-    if (!product?.id) throw new Error("Product not found");
+    if (!order?.id) throw new Error("Product not found");
 
-    const deleteProduct = await this.orderRepository.delete(id);
+    await this.orderProductRepository.deleteAllByOrderId(order.id);
 
-    return deleteProduct;
+    const deletedOrder = await this.orderRepository.delete(id);
+
+    return deletedOrder;
   }
 
   async findById(id: number): Promise<OrderInterface | null> {
-    const product = await this.orderRepository.findById(id);
+    const order = await this.orderRepository.findById(id);
 
-    if (!product) throw new Error("Product not found");
+    if (!order) throw new Error("Product not found");
 
-    return product;
+    const orderId = order.id as number;
+
+    return {
+      ...order,
+      orderProducts: await this.orderProductRepository.getAllByOrderId(orderId),
+      products: await this.orderRepository.getAllOrderProducts(orderId),
+      client: await this.orderRepository.getOrderClient(orderId),
+    };
   }
 }
 
-export default new OrderService(OrderRepository);
+export default new OrderService(OrderRepository, OrderProductRepository);
