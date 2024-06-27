@@ -28,7 +28,7 @@
         title="Clientes"
         to="/clients"
       />
-      <v-list-item prepend-icon="mdi-cash-multiple" lines="two" link title="Ordens" to="/orders" />
+      <v-list-item prepend-icon="mdi-cash-multiple" lines="two" link title="Pedidos" to="/orders" />
     </v-navigation-drawer>
 
     <v-app-bar>

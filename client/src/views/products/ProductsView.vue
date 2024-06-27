@@ -29,10 +29,10 @@ import { onMounted, ref } from 'vue'
 import { productColumns } from '@/models/product'
 import { useProductStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { useCurrency } from '@/composables'
 
 import PageHeader from '@/components/pages/PageHeader.vue'
 import ProductForm from '@/components/forms/ProductForm.vue'
-import { useCurrency } from '@/composables'
 
 const productStore = useProductStore()
 const { formatCurrency } = useCurrency()

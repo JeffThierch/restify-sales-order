@@ -6,22 +6,22 @@ const router = createRouter({
     {
       path: '/',
       name: 'Dashboard',
-      component: () => import('@/views/DashboardView.vue')
+      component: () => import('@/views/dashboard/DashboardView.vue')
     },
     {
       path: '/products',
       name: 'Products',
-      component: () => import('@/views/ProductsView.vue')
+      component: () => import('@/views/products/ProductsView.vue')
     },
     {
       path: '/clients',
       name: 'Clients',
-      component: () => import('@/views/ClientsView.vue')
+      component: () => import('@/views/clients/ClientsView.vue')
     },
     {
       path: '/orders',
       name: 'Orders',
-      component: () => import('@/views/OrdersView.vue')
+      component: () => import('@/views/orders/OrdersView.vue')
     },
     {
       path: '/orders/:id',

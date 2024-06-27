@@ -102,11 +102,12 @@
 </template>
 
 <script setup lang="ts">
-import { useCurrency } from '@/composables'
+import { computed, onMounted, ref } from 'vue'
+
 import { orderViewProductsColuns } from '@/models/orders'
+import { useCurrency } from '@/composables'
 import { useOrderStore } from '@/stores'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, ref } from 'vue'
 import { useDate } from 'vuetify'
 
 const props = defineProps(['id'])
