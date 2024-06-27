@@ -4,7 +4,7 @@
       <v-list-item
         lines="three"
         prepend-avatar="/favicon.ico"
-        title="Sales Order"
+        title="Restify Sales Order"
         subtitle="1.0.0"
         nav
       >
@@ -12,23 +12,14 @@
 
       <v-divider></v-divider>
 
-      <v-list-item prepend-icon="mdi-chart-bar" lines="two" link title="Dashboard" to="/" />
-
       <v-list-item
-        prepend-icon="mdi-package-variant-closed"
+        v-for="menuItem of menuItems"
+        :prepend-icon="menuItem.icon"
         lines="two"
         link
-        title="Produtos"
-        to="/products"
+        :title="menuItem.title"
+        :to="menuItem.to"
       />
-      <v-list-item
-        prepend-icon="mdi-account-group"
-        lines="two"
-        link
-        title="Clientes"
-        to="/clients"
-      />
-      <v-list-item prepend-icon="mdi-cash-multiple" lines="two" link title="Pedidos" to="/orders" />
     </v-navigation-drawer>
 
     <v-app-bar>
@@ -55,6 +46,7 @@ import { useTheme } from 'vuetify'
 import { useAppSettingStore } from './stores'
 import { storeToRefs } from 'pinia'
 import { RouterView } from 'vue-router'
+import { menuItems } from '@/utils/MenuItems'
 
 const appSettings = useAppSettingStore()
 const { theme: userTheme } = storeToRefs(appSettings)
