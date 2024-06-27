@@ -1,103 +1,112 @@
 <template>
   <div class="pa-4 text-center">
     <v-dialog v-model="showModal" max-width="600">
-      <v-card :title="`${formAction} Pedido`">
-        <v-card-text>
-          <v-row dense>
-            <v-col cols="12" md="12" sm="12">
-              <v-select
-                v-model="model.client_id"
-                :items="clientStore.allClients"
-                label="Cliente*"
-                item-title="name"
-                item-value="id"
-              ></v-select>
-            </v-col>
-          </v-row>
+      <v-form fast-fail @submit.prevent ref="formRef">
+        <v-card :title="`${formAction} Pedido`">
+          <v-card-text>
+            <v-row dense>
+              <v-col cols="12" md="12" sm="12">
+                <v-select
+                  :rules="rules.client_id"
+                  v-model="model.client_id"
+                  :items="clientStore.allClients"
+                  label="Cliente*"
+                  item-title="name"
+                  item-value="id"
+                ></v-select>
+              </v-col>
+            </v-row>
 
-          <v-row dense>
-            <v-col cols="12" md="12" sm="12">
-              <v-date-input label="Data" v-model="model.date" prepend-icon=""></v-date-input>
-            </v-col>
-          </v-row>
+            <v-row dense>
+              <v-col cols="12" md="12" sm="12">
+                <v-date-input
+                  label="Data"
+                  v-model="model.date"
+                  prepend-icon=""
+                  :rules="rules.date"
+                ></v-date-input>
+              </v-col>
+            </v-row>
 
-          <v-row dense>
-            <v-col cols="12" md="12" sm="12">
-              <v-card variant="text" v-if="products.length">
-                <v-card-title>Produtos</v-card-title>
+            <v-row dense>
+              <v-col cols="12" md="12" sm="12">
+                <v-card variant="text" v-if="products.length">
+                  <v-card-title>Produtos</v-card-title>
 
-                <section class="overflow-y-auto" :style="{ maxHeight: '300px' }">
-                  <v-row dense v-for="(product, index) in products">
-                    <v-col cols="6" md="6" sm="6">
-                      <v-select
-                        v-model="product.product"
-                        :items="avaliblesProducts"
-                        return-object
-                        item-title="name"
-                        label="Produto"
-                      />
-                    </v-col>
-
-                    <v-col cols="6" md="6" sm="6">
-                      <section class="d-flex">
-                        <v-number-input
-                          control-variant="split"
-                          label="Quantidade *"
-                          :step="1"
-                          :min="0"
-                          v-model="product.quantity"
+                  <section class="overflow-y-auto" :style="{ maxHeight: '300px' }">
+                    <v-row dense v-for="(product, index) in products">
+                      <v-col cols="6" md="6" sm="6">
+                        <v-select
+                          v-model="product.product"
+                          :items="avaliblesProducts"
+                          return-object
+                          item-title="name"
+                          label="Produto"
                         />
+                      </v-col>
 
-                        <v-btn
-                          density="default"
-                          variant="text"
-                          size="medium"
-                          icon="mdi-trash-can-outline"
-                          class="align-self-baseline justify-center ml-2 mt-5"
-                          @click="removeProduct(index)"
-                        ></v-btn>
-                      </section>
-                    </v-col>
-                  </v-row>
-                </section>
-              </v-card>
+                      <v-col cols="6" md="6" sm="6">
+                        <section class="d-flex">
+                          <v-number-input
+                            control-variant="split"
+                            label="Quantidade *"
+                            :step="1"
+                            :min="0"
+                            v-model="product.quantity"
+                          />
 
-              <v-btn
-                v-if="avaliblesProducts.length"
-                class="mt-1"
-                text="Novo Produto"
-                color="primary"
-                variant="tonal"
-                @click="addProduct"
-                :disabled="props.loading"
-              />
-            </v-col>
-          </v-row>
+                          <v-btn
+                            density="default"
+                            variant="text"
+                            size="medium"
+                            icon="mdi-trash-can-outline"
+                            class="align-self-baseline justify-center ml-2 mt-5"
+                            @click="removeProduct(index)"
+                          ></v-btn>
+                        </section>
+                      </v-col>
+                    </v-row>
+                  </section>
+                </v-card>
 
-          <small class="text-caption text-medium-emphasis">* Indica campo obrigatorio</small>
-        </v-card-text>
+                <v-btn
+                  v-if="avaliblesProducts.length"
+                  class="mt-1"
+                  text="Novo Produto"
+                  color="primary"
+                  variant="tonal"
+                  @click="addProduct"
+                  :disabled="props.loading"
+                />
+              </v-col>
+            </v-row>
 
-        <v-divider></v-divider>
+            <small class="text-caption text-medium-emphasis">* Indica campo obrigatorio</small>
+          </v-card-text>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-divider></v-divider>
 
-          <v-btn
-            text="Cancelar"
-            variant="plain"
-            @click="emit('hidden')"
-            :disabled="props.loading"
-          />
+          <v-card-actions>
+            <v-spacer></v-spacer>
 
-          <v-btn
-            color="primary"
-            :text="props.loading ? 'Carregando...' : 'Salvar'"
-            variant="tonal"
-            @click="submit"
-            :disabled="props.loading"
-          />
-        </v-card-actions>
-      </v-card>
+            <v-btn
+              text="Cancelar"
+              variant="plain"
+              @click="emit('hidden')"
+              :disabled="props.loading"
+            />
+
+            <v-btn
+              type="submit"
+              color="primary"
+              :text="props.loading ? 'Carregando...' : 'Salvar'"
+              variant="tonal"
+              @click="submit"
+              :disabled="props.loading"
+            />
+          </v-card-actions>
+        </v-card>
+      </v-form>
     </v-dialog>
   </div>
 </template>
@@ -109,6 +118,7 @@ import { clone } from 'radash'
 import { orderModel } from '@/models/orders'
 import { useDate } from 'vuetify'
 import { useClientStore, useProductStore } from '@/stores'
+import { useOrderValidation } from '@/validations'
 
 const props = defineProps(['loading'])
 
@@ -120,11 +130,13 @@ const emit = defineEmits<{
 const date = useDate()
 const productStore = useProductStore()
 const clientStore = useClientStore()
+const { rules } = useOrderValidation()
 
 const model = ref(clone(orderModel))
 const showModal = ref(false)
 const formAction = ref('Criar')
 const products = ref<any[]>([])
+const formRef = ref<any>()
 
 const avaliblesProducts = computed(() => {
   const selectedProducts = products.value.reduce((acc, product) => {
@@ -169,7 +181,11 @@ function hide() {
   model.value = clone(orderModel)
 }
 
-function submit() {
+async function submit() {
+  const isFormValid = await validateForm()
+
+  if (!isFormValid) return
+
   emit('submit', {
     ...model.value,
     products: products.value.map((product) => ({
@@ -187,6 +203,12 @@ function addProduct() {
 
 function removeProduct(index: number) {
   products.value.splice(index, 1)
+}
+
+async function validateForm() {
+  const { valid } = await formRef.value.validate()
+
+  return valid
 }
 
 defineExpose({ show, hide })
