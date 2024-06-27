@@ -7,6 +7,7 @@ const pollConfig: PoolOptions = {
   database: environment.DB_DATABASE,
   host: environment.DB_HOST,
   port: environment.DB_PORT,
+  dateStrings: true,
 };
 
 const databaseConnection = mysql.createPool(pollConfig);
