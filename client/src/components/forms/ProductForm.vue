@@ -69,7 +69,6 @@ function show(data: any) {
   formAction.value = data?.id ? 'Editar' : 'Criar'
 
   if (data?.id) {
-    console.log(data)
     model.value = { ...model.value, ...data }
   }
 
