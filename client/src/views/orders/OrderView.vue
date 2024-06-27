@@ -30,14 +30,7 @@
                   Quantidade de produtos
                 </label>
 
-                <p id="client-name" class="text-subtitle-1 text-center">
-                  {{
-                    order?.orderProducts?.reduce(
-                      (acc: any, product: any) => (acc += product.quantity),
-                      0
-                    )
-                  }}
-                </p>
+                <p id="client-name" class="text-subtitle-1 text-center">{{ productsQuantity }}</p>
               </section>
             </v-col>
 
@@ -48,14 +41,7 @@
                 </label>
 
                 <p id="client-name" class="text-subtitle-1 text-center">
-                  {{
-                    formatCurrency(
-                      order?.orderProducts?.reduce(
-                        (acc: any, product: any) => (acc += product.price),
-                        0
-                      )
-                    )
-                  }}
+                  {{ formatCurrency(totalOrderValue) }}
                 </p>
               </section>
             </v-col>
@@ -154,6 +140,17 @@ const orderProducts = computed(() => {
     price: productsById.value[orderProduct.product_id]?.price ?? '',
     quantity: orderProduct?.quantity ?? ''
   }))
+})
+
+const productsQuantity = computed(() => {
+  return order.value?.orderProducts?.reduce(
+    (acc: any, product: any) => (acc += product.quantity),
+    0
+  )
+})
+
+const totalOrderValue = computed(() => {
+  return order.value?.orderProducts?.reduce((acc: any, product: any) => (acc += product.price), 0)
 })
 
 function filterByProduct(value: any, query: any, _item: any) {
