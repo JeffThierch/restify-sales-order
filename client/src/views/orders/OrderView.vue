@@ -48,11 +48,13 @@
                 </label>
 
                 <p id="client-name" class="text-subtitle-1 text-center">
-                  R$
                   {{
-                    order?.orderProducts
-                      ?.reduce((acc: any, product: any) => (acc += product.price), 0)
-                      ?.toFixed(2)
+                    formatCurrency(
+                      order?.orderProducts?.reduce(
+                        (acc: any, product: any) => (acc += product.price),
+                        0
+                      )
+                    )
                   }}
                 </p>
               </section>
@@ -103,6 +105,10 @@
               </v-col>
             </v-row>
           </template>
+
+          <template v-slot:item.price="{ item }: { item: any }">
+            {{ formatCurrency(item.price) }}
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -110,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '@/composables'
 import { orderViewProductsColuns } from '@/models/orders'
 import { useOrderStore } from '@/stores'
 import { storeToRefs } from 'pinia'
@@ -120,6 +127,7 @@ const props = defineProps(['id'])
 
 const orderStore = useOrderStore()
 const date = useDate()
+const { formatCurrency } = useCurrency()
 
 const { order } = storeToRefs(orderStore)
 const breadcrumLinks = ref([

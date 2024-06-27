@@ -12,6 +12,10 @@
           <v-icon class="me-2" size="small" @click="showModal(item)"> mdi-pencil </v-icon>
           <v-icon size="small" @click="deleteProduct(item)"> mdi-delete </v-icon>
         </template>
+
+        <template v-slot:item.price="{ item }">
+          {{ formatCurrency(item.price) }}
+        </template>
       </v-data-table>
     </v-card>
 
@@ -28,8 +32,10 @@ import { storeToRefs } from 'pinia'
 
 import PageHeader from '@/components/pages/PageHeader.vue'
 import ProductForm from '@/components/forms/ProductForm.vue'
+import { useCurrency } from '@/composables'
 
 const productStore = useProductStore()
+const { formatCurrency } = useCurrency()
 
 const { allProducts } = storeToRefs(productStore)
 
