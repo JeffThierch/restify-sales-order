@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm run dev",
+    "dev:up": "npm run dev:docker:up && npx concurrently --kill-others \"npm:server:dev\" \"npm:client:dev\"",
+    "dev:docker:up": "docker-compose -f docker-compose.dev.yml up -d",
+    "dev:docker:down": "docker-compose -f docker-compose.dev.yml down"
   },
   "keywords": [],
   "author": "",

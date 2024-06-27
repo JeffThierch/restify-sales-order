@@ -1,0 +1,32 @@
+version: "3.2"
+services:
+  restify-sales-order-dev-database:
+    container_name: restify-sales-order-dev-database
+    platform: linux/amd64
+    image: mysql:8.0
+    volumes:
+      - "restify-sales-order-dev-data:/var/lib/mysql"
+      - "./.docker/database/my.cnf:/etc/mysql/conf.d/my.cnf"
+    ports:
+      - "${DB_PORT}:3306"
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    networks:
+      - default
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=${DB_PASSWORD}
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 55
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  restify-sales-order-dev-data:
+    name: restify-sales-order-dev-data

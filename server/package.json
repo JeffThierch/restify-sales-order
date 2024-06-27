@@ -4,11 +4,32 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsc && node ./build/server.js",
+    "dev": "nodemon"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "restify": "^11.1.0"
+    "@gilbertco/restify-async-wrap": "^0.1.2",
+    "http-status-codes": "^2.3.0",
+    "mysql2": "^3.10.1",
+    "restify": "^11.1.0",
+    "restify-cors-middleware2": "^2.2.1"
+  },
+  "overrides": {
+    "eslint": "^9.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.5.0",
+    "@types/node": "^20.14.8",
+    "@types/restify": "^8.5.12",
+    "@types/typescript": "^2.0.0",
+    "eslint": "^9.5.0",
+    "globals": "^15.6.0",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^7.13.1"
   }
 }
