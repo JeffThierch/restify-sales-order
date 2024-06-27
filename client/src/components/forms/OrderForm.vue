@@ -179,6 +179,7 @@ function hide() {
   showModal.value = false
   formAction.value = 'Criar'
   model.value = clone(orderModel)
+  products.value = []
 }
 
 async function submit() {
